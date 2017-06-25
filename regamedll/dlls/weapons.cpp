@@ -1553,47 +1553,15 @@ void CBasePlayerWeapon::__MAKE_VHOOK(RetireWeapon)()
 	g_pGameRules->GetNextBestWeapon(m_pPlayer, this);
 }
 
+
 // GetNextAttackDelay - An accurate way of calcualting the next attack time.
 float CBasePlayerWeapon::GetNextAttackDelay(float delay)
 {
-#ifndef REGAMEDLL_FIXES
-	if (m_flLastFireTime == 0.0f || m_flNextPrimaryAttack == -1.0f)
-	{
-		// At this point, we are assuming that the client has stopped firing
-		// and we are going to reset our book keeping variables.
-		m_flPrevPrimaryAttack = delay;
-		m_flLastFireTime = gpGlobals->time;
-	}
-#endif
+//taken from cs16nd by nagicode
+//m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + delay;
+float flNextAttack = UTIL_WeaponTimeBase() + delay;
 
-#ifdef REGAMEDLL_BUILD_6153
-
-	// TODO: Build 6xxx
-	// at build 6153 beta this removed
-	// maybe it was initiated due to the delay of the shot
-
-	// calculate the time between this shot and the previous
-	float flTimeBetweenFires = gpGlobals->time - m_flLastFireTime;
-	float flCreep = 0.0f;
-
-	if (flTimeBetweenFires > 0)
-	{
-		flCreep = flTimeBetweenFires - m_flPrevPrimaryAttack;
-	}
-
-	float flNextAttack = UTIL_WeaponTimeBase() + delay - flCreep;
-#else
-	float flNextAttack = UTIL_WeaponTimeBase() + delay;
-#endif
-
-	// save the last fire time
-	m_flLastFireTime = gpGlobals->time;
-
-	// we need to remember what the m_flNextPrimaryAttack time is set to for each shot,
-	// store it as m_flPrevPrimaryAttack.
-	m_flPrevPrimaryAttack = flNextAttack - UTIL_WeaponTimeBase();
-
-	return flNextAttack;
+return flNextAttack;
 }
 
 LINK_ENTITY_TO_CLASS(weaponbox, CWeaponBox, CCSWeaponBox)
